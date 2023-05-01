@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <h1>Найти числа начиная с единицы и так далее!</h1>
+    <div id="parent">
+        <table id="field"></table>
+    </div>
+
+    <script>
+        let field = document.querySelector('#field');
+
+        start(2);   ///запуск игры
+
+        function start(size) {
+            activate(build(field, prepare(size)), size);  //сначала выполняется ф prepare(size), затем build, затем activate
+        }
+
+        function activate(cells, size) {  // активируем ячейки по клику. Параметрами принимаем массив, который получили в build и size
+            let counter = 1;  // чтобы актирировалась нужная ячейка(по порядку)
+
+            for (let cell of cells) {
+                cell.addEventListener('click', function () {
+                    if (this.textContent == counter) {
+                        this.classList.add('active');
+
+                        if (counter == size * size) { // когда counter будет равен максимальному числу на поле
+                            start(++size); // то увеличиваем размер поля на 1
+                        }
+
+                        counter++; //увеличиваем на 1 и по кругу
+                    }
+                });
+            }
+        }
+
+        function build(field, arr) { // строим табличку, парметром принимаем игровое поле и двумерный массив prepare(size)
+            field.textContent = ''; // очищаем текст таблицы, перед тем как создавать в ней поле
+            let cells = [];
+
+            for (let sub of arr) {
+                let tr = document.createElement('tr');
+
+                for (let num of sub) {
+                    let td = document.createElement('td');
+                    td.textContent = num;
+                    tr.appendChild(td);
+
+                    cells.push(td);
+                }
+
+                field.appendChild(tr);
+            }
+
+            return cells;
+        }
+
+        function prepare(size) {  // возвращает двухмерный массив, значения которого перемешаны случайным образом
+            let arr = []
+            arr = range(size * size) // получаем массив
+            arr = shuffle(arr) // перемешиваем его
+            arr = chunk(arr, size) // делаем его двухмерным
+            return arr;
+        }
+
+        function range(count) { // создаем массив, параметром принимаем мксимальное значение (size*size)
+            let arr = []
+            for (let i = 1; i <= count; i++) {
+                arr.push(i)
+            }
+            return arr
+        }
+
+        function shuffle(arr) {  //перемешиваем массив
+            let j, temp;
+            for (let i = arr.length - 1; i > 0; i--) {
+                j = Math.floor(Math.random() * (i + 1));
+                temp = arr[j];
+                arr[j] = arr[i];
+                arr[i] = temp;
+            }
+            return arr;
+        }
+
+        function chunk(arr, n) { // делаем массив двухмерным, n - количество элементов в подмассиве
+            let result = []                  //результирующий массив
+            let count = Math.ceil(arr.length / n) // с помощью Math.ceil, округляем до целого вверх
+            for (let i = 0; i < count; i++) { // сколько равен count, столько и будет прокручиваться цикл
+                let elems = arr.splice(0, n)  // с помощью splice, вырезаем из массива первые эл(отрезаем от начала до n)
+                result.push(elems)  //добавл в результирующий массив подмассив из n элементов
+                // затом так же добавляются остальные подмассивы
+            }
+            return result
+        }
+
+    </script>
+    <style>
+        h1 {
+            text-align: center;
+        }
+
+        #parent {
+            text-align: center;
+        }
+
+        #field {
+            display: inline-block;
+        }
+
+        #field td {
+            padding: 20px;
+            border: 1px solid black;
+            cursor: pointer;
+        }
+
+        .active {
+            background: red;
+        }
+    </style>
+
+</body>
+
+
+</html>
